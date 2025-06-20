@@ -1,0 +1,46 @@
+# Ignore everything
+*
+
+# Allow Python files
+!*.py
+
+# Allow HTML templates
+!*.html
+!templates/
+!templates/**
+
+# Allow CSS files
+!*.css
+!static/
+!static/**
+
+# Allow README
+!README.md
+
+# Allow .gitignore
+!.gitignore
+
+# Allow requirements.txt if exists
+!requirements.txt
+
+# Allow Docker files if exists
+!Dockerfile
+!docker-compose.yml
+!docker-compose.yaml
+
+# Allow Terraform files if exists
+!*.tf
+!*.tfvars
+
+# Allow YAML files (for k8s, etc.)
+!*.yml
+!*.yaml
+
+# Allow JSON files (for configs)
+!*.json
+
+# Allow shell scripts
+!*.sh
+
+# Allow markdown files
+!*.md
