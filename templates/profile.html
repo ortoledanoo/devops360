@@ -3,55 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DevOps360 Profile</title>
+    <title>Profile - DevOps360</title>
     <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
     <div class="container">
         <div class="profile">
-            <h2>Welcome, {{ user.username }}</h2>
+            <h2>Welcome, {{ user.username }}!</h2>
+            
             <div class="info">
                 <p><strong>Email:</strong> {{ user.email }}</p>
-                <p><strong>Created:</strong> {{ user.created_at }}</p>
-                {% if user.phone %}<p><strong>Phone:</strong> {{ user.phone }}</p>{% endif %}
-                {% if user.address %}<p><strong>Address:</strong> {{ user.address }}</p>{% endif %}
             </div>
-            <div class="menu">
-                <a href="#upload">Upload File</a> |
-                <a href="#files">My Files</a> |
-                <a href="#send-sms">Send SMS</a> |
-                <a href="/edit_profile">Edit Profile</a>
-            </div>
-            {% if success %}<div class="success">{{ success }}</div>{% endif %}
-            {% if error %}<div class="error">{{ error }}</div>{% endif %}
-            <section id="upload">
-                <form class="upload-form" method="post" action="/upload" enctype="multipart/form-data">
-                    <label>Upload file:</label>
-                    <input type="file" name="file" required>
-                    <button type="submit">Upload</button>
-                </form>
-            </section>
-            <section id="files">
-                <h3>My Uploaded Files</h3>
-                {% if files and files|length > 0 %}
-                <ul class="file-list">
+            
+            <div style="background: #23283a; padding: 15px; border-radius: 8px; margin: 20px 0;">
+                <h3>Your Files:</h3>
+                {% if files %}
+                    <ul>
                     {% for file in files %}
-                    <li>
-                        {{ file }}
-                        <a href="/download/{{ file }}" target="_blank">Download</a>
-                        <a href="/preview/{{ file }}" target="_blank">Preview</a>
-                    </li>
+                        <li>{{ file }}</li>
                     {% endfor %}
-                </ul>
+                    </ul>
                 {% else %}
-                <p>No files uploaded yet.</p>
+                    <p>No files uploaded yet.</p>
                 {% endif %}
-            </section>
-            <section id="send-sms">
-                <form class="sns-form" method="post" action="/send_message">
-                    <button type="submit">Send me a message</button>
-                </form>
-            </section>
+            </div>
+            
+            <form method="post" action="/upload">
+                <label>Upload a file (demo - just enter filename):</label>
+                <input type="text" name="file" placeholder="Enter filename" required>
+                <button type="submit">Upload</button>
+            </form>
+            
+            <form method="post" action="/send_message" style="margin-top: 20px;">
+                <button type="submit">Send me a message (demo)</button>
+            </form>
+            
+            <p style="text-align: center; margin-top: 30px;">
+                <a href="/">Back to Home</a>
+            </p>
         </div>
     </div>
 </body>
