@@ -11,7 +11,7 @@ import uuid
 # AWS CONFIGURATION
 # =====================
 # Set your AWS region here (must match where your DynamoDB table and S3 bucket are)
-AWS_REGION = 'us-east-1'  # <-- CHANGE THIS TO YOUR REGION IF NEEDED
+AWS_REGION = 'il-central-1'  # <-- CHANGE THIS TO YOUR REGION IF NEEDED
 
 # =====================
 # FASTAPI APP SETUP
