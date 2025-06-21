@@ -1,39 +1,29 @@
+{#
+    base.html: The main layout template for all pages.
+    - Provides the HTML skeleton, header, footer, and includes Tailwind CSS via CDN.
+    - All other templates extend this file and override the 'title', 'head', and 'content' blocks.
+    - Use this to ensure a consistent look and feel across the app.
+#}
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}DevOps360{% endblock %}</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
-    <script>
-      // Tailwind dark mode toggle
-      function toggleTheme() {
-        const html = document.documentElement;
-        html.classList.toggle('dark');
-        localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
-      }
-      // On load, set theme from localStorage
-      if (localStorage.getItem('theme') === 'light') {
-        document.documentElement.classList.remove('dark');
-      }
-    </script>
     {% block head %}{% endblock %}
 </head>
-<body class="min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 flex flex-col">
-    <header class="w-full shadow bg-white dark:bg-gray-800">
+<body class="min-h-screen bg-gray-100 text-gray-900 flex flex-col">
+    <header class="w-full shadow bg-white">
         <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-            <a href="/" class="text-2xl font-bold tracking-tight text-cyan-600 dark:text-cyan-400">DevOps360</a>
-            <button onclick="toggleTheme()" class="ml-4 px-3 py-1 rounded bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-cyan-200 dark:hover:bg-cyan-700 transition">
-                <span class="hidden dark:inline">🌞 Light</span>
-                <span class="dark:hidden">🌙 Dark</span>
-            </button>
+            <a href="/" class="text-2xl font-bold tracking-tight text-cyan-600">DevOps360</a>
         </div>
     </header>
     <main class="flex-1 flex flex-col items-center justify-center">
         {% block content %}{% endblock %}
     </main>
-    <footer class="w-full text-center py-4 text-xs text-gray-400 dark:text-gray-500 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
+    <footer class="w-full text-center py-4 text-xs text-gray-400 bg-white border-t border-gray-200">
         &copy; 2025 DevOps360. All rights reserved.
     </footer>
 </body>

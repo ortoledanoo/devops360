@@ -151,4 +151,31 @@ Devops360/
 
 ---
 
+## S3 Bucket Policy for Public Profile Photos
+
+To allow users' profile photos to be publicly viewable (while keeping all other files private), add the following bucket policy to your S3 bucket:
+
+```
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "AllowPublicReadProfilePhotos",
+      "Effect": "Allow",
+      "Principal": "*",
+      "Action": "s3:GetObject",
+      "Resource": "arn:aws:s3:::my-s3-real-bucket/profile_photos/*"
+    }
+  ]
+}
+```
+
+- Replace `my-s3-real-bucket` with your actual bucket name if different.
+- This policy allows public read access **only** to files in the `profile_photos/` directory.
+- All other files in the bucket remain private by default.
+
+**Note:** You must also turn OFF "Block all public access" for your bucket in the AWS S3 console for this policy to take effect.
+
+---
+
 **Happy learning and building! 🚀** 

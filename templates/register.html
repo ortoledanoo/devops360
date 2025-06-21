@@ -1,6 +1,14 @@
 {% extends "base.html" %}
 {% block title %}Register - DevOps360{% endblock %}
 {% block content %}
+{#
+    register.html: The user registration page.
+    - Provides a form for new users to create an account.
+    - Collects username, email, password, address, zip code, and profile photo.
+    - Shows error messages if registration fails.
+    - Includes a live preview for the profile photo before submission.
+    - Uses Tailwind CSS for styling.
+#}
 <div class="w-full max-w-md mx-auto mt-20 bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8">
     <form class="flex flex-col gap-6" method="post" action="/register" enctype="multipart/form-data">
         <h2 class="text-2xl font-bold text-cyan-600 dark:text-cyan-400 text-center">Register</h2>
@@ -14,7 +22,8 @@
         <input type="text" name="zip_code" placeholder="Zip Code" required class="bg-gray-100 dark:bg-gray-900 border border-cyan-300 dark:border-cyan-700 rounded-lg px-4 py-3 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-cyan-400 transition" />
         <div>
             <label class="block font-semibold text-cyan-600 dark:text-cyan-400 mb-1">Profile Photo:</label>
-            <input type="file" name="profile_photo" accept="image/*" class="block w-full text-gray-700 dark:text-gray-200" />
+            <input type="file" name="profile_photo" accept="image/*" class="block w-full text-gray-700 dark:text-gray-200" onchange="previewProfilePhoto(event)" />
+            <img id="profile-photo-preview" class="mt-4 w-24 h-24 rounded-full object-cover hidden border-4 border-cyan-400 dark:border-cyan-600" alt="Profile Preview" />
         </div>
         <button type="submit" class="w-full py-3 rounded-lg bg-cyan-600 text-white font-semibold shadow hover:bg-cyan-700 transition">Register</button>
         <p class="text-center text-gray-500 dark:text-gray-400">
@@ -24,5 +33,18 @@
             <a href="/" class="hover:underline">Back to Home</a>
         </p>
     </form>
+    <script>
+    function previewProfilePhoto(event) {
+        const [file] = event.target.files;
+        const preview = document.getElementById('profile-photo-preview');
+        if (file) {
+            preview.src = URL.createObjectURL(file);
+            preview.classList.remove('hidden');
+        } else {
+            preview.src = '';
+            preview.classList.add('hidden');
+        }
+    }
+    </script>
 </div>
 {% endblock %} 

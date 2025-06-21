@@ -1,3 +1,10 @@
+{#
+    profile.html: The user dashboard/profile page.
+    - Shows user details (username, email, address, zip code, profile photo).
+    - Sidebar for user info and navigation.
+    - Main content lists uploaded files, allows file upload, and demo message action.
+    - Uses Tailwind CSS for a modern dashboard layout.
+#}
 {% extends "base.html" %}
 {% block title %}Dashboard - DevOps360{% endblock %}
 {% block content %}
@@ -5,9 +12,9 @@
     <!-- Sidebar -->
     <aside class="w-full md:w-64 bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 flex flex-col items-center mb-6 md:mb-0">
         {% if user.profile_photo %}
-        <img src="{{ user.profile_photo }}" alt="Profile Photo" class="w-24 h-24 rounded-full shadow mb-4 border-4 border-cyan-400 dark:border-cyan-600">
+        <img src="{{ user.profile_photo }}" alt="Profile Photo" class="w-32 h-32 rounded-full shadow-xl mb-4 border-4 border-cyan-400 dark:border-cyan-600 object-cover transition-all duration-300">
         {% else %}
-        <div class="w-24 h-24 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-3xl text-cyan-500 mb-4">
+        <div class="w-32 h-32 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-4xl text-cyan-500 mb-4">
             <span>{{ user.user_id[0]|upper }}</span>
         </div>
         {% endif %}
