@@ -1,57 +1,58 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Profile - DevOps360</title>
-    <link rel="stylesheet" href="/static/style.css">
-</head>
-<body>
-    <div class="container">
-        <div class="profile">
-            <h2>Welcome, {{ user.user_id }}!</h2>
-            
-            <div class="info">
-                <p><strong>Email:</strong> {{ user.email }}</p>
-                <p><strong>Address:</strong> {{ user.address }}</p>
-                <p><strong>Zip Code:</strong> {{ user.zip_code }}</p>
-                {% if user.profile_photo %}
-                <p><strong>Profile Photo:</strong><br>
-                    <img src="{{ user.profile_photo }}" alt="Profile Photo" style="max-width:120px; border-radius:8px; margin-top:8px;">
-                </p>
-                {% endif %}
-            </div>
-            
-            <div style="background: #23283a; padding: 15px; border-radius: 8px; margin: 20px 0;">
-                <h3>Your Files:</h3>
-                {% if files %}
-                    <ul>
-                    {% for file in files %}
-                        <li>{{ file }}
-                            <a href="/download/{{ file }}?user={{ username }}" class="btn" style="margin-left:10px;">Download</a>
-                        </li>
-                    {% endfor %}
-                    </ul>
-                {% else %}
-                    <p>No files uploaded yet.</p>
-                {% endif %}
-            </div>
-            
-            <form method="post" action="/upload" enctype="multipart/form-data">
-                <input type="hidden" name="user" value="{{ username }}">
-                <label>Upload a file:</label>
-                <input type="file" name="file" required>
-                <button type="submit">Upload</button>
-            </form>
-            
-            <form method="post" action="/send_message" style="margin-top: 20px;">
-                <button type="submit">Send me a message (demo)</button>
-            </form>
-            
-            <p style="text-align: center; margin-top: 30px;">
-                <a href="/">Back to Home</a>
-            </p>
+{% extends "base.html" %}
+{% block title %}Dashboard - DevOps360{% endblock %}
+{% block content %}
+<div class="w-full max-w-6xl mx-auto flex flex-col md:flex-row gap-8 mt-10">
+    <!-- Sidebar -->
+    <aside class="w-full md:w-64 bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 flex flex-col items-center mb-6 md:mb-0">
+        {% if user.profile_photo %}
+        <img src="{{ user.profile_photo }}" alt="Profile Photo" class="w-24 h-24 rounded-full shadow mb-4 border-4 border-cyan-400 dark:border-cyan-600">
+        {% else %}
+        <div class="w-24 h-24 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-3xl text-cyan-500 mb-4">
+            <span>{{ user.user_id[0]|upper }}</span>
         </div>
-    </div>
-</body>
-</html> 
+        {% endif %}
+        <h2 class="text-xl font-bold text-cyan-600 dark:text-cyan-400 mb-1">{{ user.user_id }}</h2>
+        <p class="text-gray-500 dark:text-gray-300 text-sm mb-2">{{ user.email }}</p>
+        <div class="w-full border-t border-gray-200 dark:border-gray-700 my-4"></div>
+        <div class="w-full">
+            <p class="text-gray-700 dark:text-gray-200"><span class="font-semibold">Address:</span> {{ user.address }}</p>
+            <p class="text-gray-700 dark:text-gray-200"><span class="font-semibold">Zip Code:</span> {{ user.zip_code }}</p>
+        </div>
+        <a href="/" class="mt-8 w-full block text-center py-2 rounded-lg bg-cyan-600 text-white font-semibold shadow hover:bg-cyan-700 transition">Back to Home</a>
+    </aside>
+    <!-- Main Content -->
+    <section class="flex-1 flex flex-col gap-8">
+        <!-- Files Card -->
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6">
+            <h3 class="text-lg font-semibold text-cyan-500 mb-4">Your Files</h3>
+            {% if files %}
+            <ul class="divide-y divide-gray-200 dark:divide-gray-700">
+                {% for file in files %}
+                <li class="flex items-center justify-between py-2">
+                    <span class="truncate text-gray-800 dark:text-gray-100">{{ file }}</span>
+                    <a href="/download/{{ file }}?user={{ username }}" class="ml-4 px-4 py-1 rounded bg-cyan-600 text-white font-semibold shadow hover:bg-cyan-700 transition">Download</a>
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p class="text-gray-500 dark:text-gray-400">No files uploaded yet.</p>
+            {% endif %}
+        </div>
+        <!-- Upload Card -->
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6">
+            <form method="post" action="/upload" enctype="multipart/form-data" class="flex flex-col md:flex-row items-center gap-4">
+                <input type="hidden" name="user" value="{{ username }}">
+                <label class="font-semibold text-cyan-600 dark:text-cyan-400">Upload a file:</label>
+                <input type="file" name="file" required class="flex-1 bg-gray-100 dark:bg-gray-900 border border-cyan-300 dark:border-cyan-700 rounded-lg px-4 py-2 text-gray-900 dark:text-gray-100" />
+                <button type="submit" class="px-6 py-2 rounded-lg bg-cyan-600 text-white font-semibold shadow hover:bg-cyan-700 transition">Upload</button>
+            </form>
+        </div>
+        <!-- Message Demo Card -->
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 flex flex-col md:flex-row items-center gap-4">
+            <form method="post" action="/send_message" class="flex-1 flex flex-col md:flex-row items-center gap-4">
+                <button type="submit" class="px-6 py-2 rounded-lg bg-cyan-500 text-white font-semibold shadow hover:bg-cyan-600 transition">Send me a message (demo)</button>
+            </form>
+        </div>
+    </section>
+</div>
+{% endblock %} 
