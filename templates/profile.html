@@ -9,10 +9,17 @@
 <body>
     <div class="container">
         <div class="profile">
-            <h2>Welcome, {{ user.username }}!</h2>
+            <h2>Welcome, {{ user.user_id }}!</h2>
             
             <div class="info">
                 <p><strong>Email:</strong> {{ user.email }}</p>
+                <p><strong>Address:</strong> {{ user.address }}</p>
+                <p><strong>Zip Code:</strong> {{ user.zip_code }}</p>
+                {% if user.profile_photo %}
+                <p><strong>Profile Photo:</strong><br>
+                    <img src="{{ user.profile_photo }}" alt="Profile Photo" style="max-width:120px; border-radius:8px; margin-top:8px;">
+                </p>
+                {% endif %}
             </div>
             
             <div style="background: #23283a; padding: 15px; border-radius: 8px; margin: 20px 0;">

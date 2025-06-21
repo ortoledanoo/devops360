@@ -1,154 +1,154 @@
-# DevOps360 – Simple Web App for Learning DevOps
+# DevOps360 – FastAPI + AWS DynamoDB/S3 Example
 
-## 🎯 What This Is
+## 🚀 What is this project?
+This is a simple, modern web app built with **FastAPI** (Python) that lets you:
+- Register and log in users
+- Store user data (including address, zip code, and profile photo) in **DynamoDB**
+- Upload and download files to/from **S3**
+- See your profile and uploaded files
 
-This is a **simple web application** built to help you understand basic web development concepts before diving into DevOps. It's designed to be easy to understand for beginners.
-
-## 📁 Project Structure (Simplified)
-
-```
-Devops360/
-├── main.py              # The main application (everything in one file!)
-├── templates/           # HTML pages
-│   ├── home.html       # Welcome page
-│   ├── login.html      # Login form
-│   ├── register.html   # Registration form
-│   └── profile.html    # User profile page
-├── static/
-│   └── style.css       # Styling for all pages
-├── uploads/            # Where files would be stored (not used in demo)
-├── README.md           # This file
-└── .gitignore          # Git ignore rules
-```
-
-## 🚀 How to Run
-
-1. **Install Python** (if you haven't already)
-2. **Create virtual environment:**
-   ```bash
-   python3 -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
-   ```
-3. **Install dependencies:**
-   ```bash
-   pip install fastapi uvicorn jinja2 python-multipart
-   ```
-4. **Run the app:**
-   ```bash
-   python main.py
-   ```
-5. **Open your browser** and go to: `http://localhost:8000`
-
-## 📖 What Each File Does
-
-### `main.py` - The Main Application
-- **What it is:** A single Python file that contains everything
-- **What it does:** 
-  - Creates a web server
-  - Handles user registration and login
-  - Shows different pages (home, login, register, profile)
-  - Stores user data in memory (simple dictionary)
-  - Handles file uploads (demo only)
-
-### `templates/` - HTML Pages
-- **home.html:** Welcome page with links to login/register
-- **login.html:** Form where users enter username/password
-- **register.html:** Form where new users create accounts
-- **profile.html:** Shows user info and lets them upload files
-
-### `static/style.css` - Styling
-- Makes the app look modern and professional
-- Uses dark theme with blue/green colors
-
-## 🔍 Key Concepts to Understand
-
-### 1. **Web Routes** (in `main.py`)
-```python
-@app.get('/')           # When someone visits the homepage
-@app.post('/login')     # When someone submits the login form
-@app.get('/profile')    # When someone visits their profile
-```
-
-### 2. **Templates** (HTML + Python)
-```html
-<!-- In HTML -->
-<h2>Welcome, {{ user.username }}!</h2>
-
-<!-- This shows the username from Python -->
-```
-
-### 3. **Forms** (How data moves around)
-```python
-# When user submits a form, we get the data:
-username = Form()  # Gets the username from the form
-password = Form()  # Gets the password from the form
-```
-
-### 4. **Data Storage** (Simple version)
-```python
-# Store users in a dictionary (in real apps, you'd use a database)
-users = {
-    'john': {'username': 'john', 'email': 'john@example.com', 'password': '123'}
-}
-```
-
-## 🎯 What You Can Do With This App
-
-1. **Register** a new account
-2. **Login** with your credentials
-3. **View** your profile
-4. **Upload** files (demo - just enter a filename)
-5. **Send messages** (demo - just prints to console)
-
-## 🔧 How to Modify and Learn
-
-### Try These Changes:
-
-1. **Add a new page:**
-   ```python
-   @app.get('/about')
-   def about_page(request: Request):
-       return templates.TemplateResponse('about.html', {'request': request})
-   ```
-
-2. **Add a new field to registration:**
-   ```python
-   # In main.py, add phone = Form() to the register function
-   # In register.html, add <input type="text" name="phone">
-   ```
-
-3. **Change the styling:**
-   - Edit `static/style.css` to change colors, fonts, etc.
-
-4. **Add more user data:**
-   - Modify the `users` dictionary to store more information
-
-## 🚀 Next Steps for DevOps
-
-Once you understand this basic app, you can:
-
-1. **Add a real database** (PostgreSQL, MySQL)
-2. **Containerize** with Docker
-3. **Deploy** to AWS/Google Cloud/Azure
-4. **Add monitoring** and logging
-5. **Set up CI/CD** pipelines
-6. **Use Infrastructure as Code** (Terraform)
-
-## 💡 Tips for Beginners
-
-- **Start small:** Don't try to understand everything at once
-- **Experiment:** Change things and see what happens
-- **Read the comments:** They explain what each part does
-- **Ask questions:** If something doesn't make sense, look it up!
-
-## 🐛 Common Issues
-
-- **"Module not found"**: Make sure you installed the dependencies
-- **"Port already in use"**: Try a different port or stop other apps
-- **"Page not found"**: Check that the URL is correct
+It's designed for beginners and DevOps learners who want to see how Python, AWS, and web apps work together.
 
 ---
 
-**Remember:** This is a learning tool. In real applications, you'd never store passwords in plain text or use in-memory storage. But this helps you understand the basics before moving to more complex topics!
+## 🗂️ Project Structure
+```
+Devops360/
+├── main.py              # The main FastAPI app (all logic here, with detailed comments)
+├── templates/           # HTML pages (Jinja2)
+│   ├── home.html
+│   ├── login.html
+│   ├── register.html
+│   └── profile.html
+├── static/
+│   └── style.css        # Modern CSS for all pages
+├── README.md            # This file
+└── .gitignore           # Git ignore rules
+```
 
-Happy learning! 🎉 
+---
+
+## 🛠️ Prerequisites
+- Python 3.10+
+- AWS account
+- AWS CLI configured (`aws configure`)
+- DynamoDB table: `my-app-db` (partition key: `user_id`, type: String)
+- S3 bucket: `my-s3-real-bucket` (in the same region as your DynamoDB table)
+- Your AWS credentials must have access to both DynamoDB and S3
+
+---
+
+## ⚙️ Setup & Run
+1. **Clone the repo and enter the directory**
+2. **Create a virtual environment:**
+   ```bash
+   python3 -m venv venv
+   source venv/bin/activate
+   ```
+3. **Install dependencies:**
+   ```bash
+   pip install fastapi uvicorn jinja2 python-multipart boto3
+   ```
+4. **Set your AWS region in `main.py`:**
+   ```python
+   AWS_REGION = 'us-east-1'  # Change to your region if needed
+   ```
+5. **Run the app:**
+   ```bash
+   python main.py
+   ```
+6. **Open your browser:**
+   - Go to [http://localhost:8000](http://localhost:8000)
+
+---
+
+## 📝 How it Works (with Comments)
+
+### 1. **AWS Setup in Code**
+- The app uses `boto3` to connect to DynamoDB and S3.
+- You must set the correct AWS region in `main.py`:
+  ```python
+  AWS_REGION = 'us-east-1'  # <-- Set this to your region
+  s3_client = boto3.client('s3', region_name=AWS_REGION)
+  ddb = boto3.resource('dynamodb', region_name=AWS_REGION)
+  table = ddb.Table('my-app-db')
+  ```
+
+### 2. **User Registration**
+- Checks if the username exists in DynamoDB.
+- If a profile photo is uploaded, it is saved to S3 and the public URL is stored in DynamoDB.
+- All user data (username, email, password, address, zip code, photo URL) is saved as a single item in DynamoDB.
+
+### 3. **Login**
+- Fetches the user from DynamoDB by `user_id`.
+- Checks the password (plain text for demo; in real apps, always hash passwords!).
+- If correct, redirects to the profile page.
+
+### 4. **Profile Page**
+- Loads user data from DynamoDB.
+- Lists all files in S3 under the user's folder (e.g., `username/filename.txt`).
+- Shows address, zip code, and profile photo (if present).
+
+### 5. **File Upload**
+- Lets the user upload files to S3 (stored as `username/filename`).
+- Uploaded files are listed on the profile page.
+
+### 6. **File Download**
+- Streams files from S3 to the user's browser.
+- Only allows download if the user is logged in.
+
+---
+
+## 🧑‍💻 Code Walkthrough (main.py)
+- **AWS_REGION**: Set this to match your AWS resources.
+- **S3_BUCKET**: Name of your S3 bucket.
+- **DDB_TABLE**: Name of your DynamoDB table.
+- **s3_client/ddb/table**: boto3 clients for AWS services.
+- **@app.get('/register')**: Shows the registration form.
+- **@app.post('/register')**: Handles registration, uploads photo to S3, saves user to DynamoDB.
+- **@app.get('/login')**: Shows the login form.
+- **@app.post('/login')**: Checks credentials against DynamoDB.
+- **@app.get('/profile')**: Loads user data and file list from AWS.
+- **@app.post('/upload')**: Uploads a file to S3 under the user's folder.
+- **@app.get('/download/{filename}')**: Streams a file from S3 for download.
+
+---
+
+## 🏗️ How to Extend This Project
+- Add password hashing (use `bcrypt` or `passlib`)
+- Add user sessions (use `fastapi-login` or `fastapi-users`)
+- Add email verification (use AWS SES)
+- Add file preview (images, text)
+- Add user profile editing
+- Add admin features
+- Deploy to AWS (ECS, EKS, or Lambda)
+- Use Terraform or AWS CDK for infrastructure as code
+
+---
+
+## 🐛 Troubleshooting
+- **ResourceNotFoundException**: Make sure your DynamoDB table and S3 bucket exist in the correct region.
+- **AccessDenied**: Check your AWS credentials and permissions.
+- **File upload issues**: Make sure your S3 bucket allows uploads and your IAM user/role has `s3:PutObject` permission.
+- **Profile photo not showing**: Make sure your S3 bucket allows public read or use signed URLs.
+
+---
+
+## 💡 Tips for Beginners
+- Read the comments in `main.py` – they explain every step.
+- Try changing the code and see what happens!
+- Use the AWS Console to view your DynamoDB table and S3 bucket.
+- Always use environment variables or AWS Secrets Manager for real credentials (never hardcode in production).
+
+---
+
+## 📚 Useful Links
+- [FastAPI Documentation](https://fastapi.tiangolo.com/)
+- [Boto3 Documentation](https://boto3.amazonaws.com/v1/documentation/api/latest/index.html)
+- [DynamoDB Docs](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/)
+- [S3 Docs](https://docs.aws.amazon.com/s3/index.html)
+- [AWS Free Tier](https://aws.amazon.com/free/)
+
+---
+
+**Happy learning and building! 🚀** 
