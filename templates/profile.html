@@ -20,7 +20,9 @@
                 {% if files %}
                     <ul>
                     {% for file in files %}
-                        <li>{{ file }}</li>
+                        <li>{{ file }}
+                            <a href="/download/{{ file }}?user={{ username }}" class="btn" style="margin-left:10px;">Download</a>
+                        </li>
                     {% endfor %}
                     </ul>
                 {% else %}
@@ -28,9 +30,10 @@
                 {% endif %}
             </div>
             
-            <form method="post" action="/upload">
-                <label>Upload a file (demo - just enter filename):</label>
-                <input type="text" name="file" placeholder="Enter filename" required>
+            <form method="post" action="/upload" enctype="multipart/form-data">
+                <input type="hidden" name="user" value="{{ username }}">
+                <label>Upload a file:</label>
+                <input type="file" name="file" required>
                 <button type="submit">Upload</button>
             </form>
             

@@ -1,8 +1,10 @@
-from fastapi import FastAPI, Request, Form
-from fastapi.responses import RedirectResponse, HTMLResponse
+from fastapi import FastAPI, Request, Form, UploadFile, File
+from fastapi.responses import RedirectResponse, HTMLResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 import os
+import boto3
+import io
 
 # Create the FastAPI app
 app = FastAPI()
@@ -16,8 +18,11 @@ templates = Jinja2Templates(directory='templates')
 # Simple in-memory storage for users (in real apps, you'd use a database)
 users = {}
 
-# Simple in-memory storage for uploaded files info
-user_files = {}
+# S3 bucket name
+S3_BUCKET = 'my-s3-real-bucket'
+
+# S3 client
+s3_client = boto3.client('s3')
 
 @app.get('/')
 def home(request: Request):
@@ -32,21 +37,16 @@ def register_page(request: Request):
 @app.post('/register')
 def register_user(request: Request, username: str = Form(), email: str = Form(), password: str = Form()):
     """Handle user registration"""
-    # Check if username already exists
     if username in users:
         return templates.TemplateResponse('register.html', {
             'request': request, 
             'error': 'Username already exists!'
         })
-    
-    # Store user info (in real apps, you'd hash the password)
     users[username] = {
         'username': username,
         'email': email,
-        'password': password  # In real apps, NEVER store passwords like this!
+        'password': password
     }
-    
-    # Redirect to login page
     return RedirectResponse('/login', status_code=302)
 
 @app.get('/login')
@@ -57,10 +57,10 @@ def login_page(request: Request):
 @app.post('/login')
 def login_user(request: Request, username: str = Form(), password: str = Form()):
     """Handle user login"""
-    # Check if user exists and password matches
     if username in users and users[username]['password'] == password:
         # In real apps, you'd set a proper session cookie
-        return RedirectResponse('/profile', status_code=302)
+        response = RedirectResponse('/profile?user=' + username, status_code=302)
+        return response
     else:
         return templates.TemplateResponse('login.html', {
             'request': request, 
@@ -68,43 +68,59 @@ def login_user(request: Request, username: str = Form(), password: str = Form())
         })
 
 @app.get('/profile')
-def profile_page(request: Request):
+def profile_page(request: Request, user: str = None):
     """Show the user profile page"""
-    # For simplicity, we'll show a demo user
-    # In real apps, you'd get the user from the session
-    demo_user = {
-        'username': 'demo_user',
-        'email': 'demo@example.com'
-    }
-    
-    # Get user's files (if any)
-    user_files_list = user_files.get(demo_user['username'], [])
-    
+    # Get user from query param (for demo)
+    if not user or user not in users:
+        return RedirectResponse('/login')
+    user_data = users[user]
+    # List files in S3 for this user
+    files = []
+    prefix = f"{user}/"
+    try:
+        response = s3_client.list_objects_v2(Bucket=S3_BUCKET, Prefix=prefix)
+        for obj in response.get('Contents', []):
+            files.append(obj['Key'].split('/', 1)[-1])
+    except Exception:
+        pass
     return templates.TemplateResponse('profile.html', {
         'request': request,
-        'user': demo_user,
-        'files': user_files_list
+        'user': user_data,
+        'files': files,
+        'username': user
     })
 
 @app.post('/upload')
-def upload_file(request: Request, file: str = Form()):
-    """Handle file upload (simplified - just stores filename)"""
-    # In real apps, you'd actually save the file
-    demo_user = 'demo_user'
-    
-    if demo_user not in user_files:
-        user_files[demo_user] = []
-    
-    user_files[demo_user].append(file)
-    
-    return RedirectResponse('/profile', status_code=302)
+def upload_file(request: Request, user: str = Form(), file: UploadFile = File(...)):
+    """Handle file upload and upload to S3"""
+    if not user or user not in users:
+        return RedirectResponse('/login')
+    # Upload file to S3 under user's folder
+    s3_key = f"{user}/{file.filename}"
+    s3_client.upload_fileobj(file.file, S3_BUCKET, s3_key)
+    return RedirectResponse(f'/profile?user={user}', status_code=302)
 
 @app.post('/send_message')
 def send_message(request: Request):
     """Handle sending a message (simplified)"""
-    # In real apps, you'd integrate with AWS SNS
     print("Message sent! (This is just a demo)")
     return RedirectResponse('/profile', status_code=302)
+
+@app.get('/download/{filename}')
+def download_file(filename: str, user: str = None):
+    """Download a file from S3 for the user"""
+    if not user or user not in users:
+        return RedirectResponse('/login')
+    s3_key = f"{user}/{filename}"
+    fileobj = io.BytesIO()
+    try:
+        s3_client.download_fileobj(S3_BUCKET, s3_key, fileobj)
+        fileobj.seek(0)
+        return StreamingResponse(fileobj, media_type='application/octet-stream', headers={
+            'Content-Disposition': f'attachment; filename="{filename}"'
+        })
+    except Exception as e:
+        return HTMLResponse(f"<h2>File not found or error: {e}</h2>", status_code=404)
 
 if __name__ == "__main__":
     import uvicorn
