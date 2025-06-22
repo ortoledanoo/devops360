@@ -23,8 +23,24 @@ jobs:
       - name: Build Docker Image
         run: docker build -t ${{ secrets.DOCKER_USERNAME }}/devops360-app:latest .
 
+      - name: Test Docker Container (Health Check)
+        run: |
+          docker run -d -p 8000:8000 --name test-app ${{ secrets.DOCKER_USERNAME }}/devops360-app:latest
+          sleep 10  # Wait for the app to start
+          curl -f http://localhost:8000/ || (docker logs test-app && exit 1)
+          docker stop test-app
+          docker rm test-app
+
+      - name: Install cosign
+        run: |
+          curl -sSL -o /usr/local/bin/cosign https://github.com/sigstore/cosign/releases/latest/download/cosign-linux-amd64
+          chmod +x /usr/local/bin/cosign
+
+      - name: Sign Docker Image
+        env:
+          COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
+        run: |
+          cosign sign --key ${{ secrets.COSIGN_KEY }} ${{ secrets.DOCKER_USERNAME }}/devops360-app:latest
+
       - name: Push Docker Image
         run: docker push ${{ secrets.DOCKER_USERNAME }}/devops360-app:latest
-    
-      - name: Deploy to AWS ECS
-        run: aws ecs update-service --cluster devops360-cluster --service devops360-service --force-new-deployment
