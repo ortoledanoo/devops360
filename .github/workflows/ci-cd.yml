@@ -31,6 +31,15 @@ jobs:
           docker stop test-app
           docker rm test-app
 
+      - name: Push Docker Image
+        run: docker push ${{ secrets.DOCKER_USERNAME }}/devops360-app:latest
+
+      - name: Get image digest
+        id: digest
+        run: |
+          DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' ${{ secrets.DOCKER_USERNAME }}/devops360-app:latest)
+          echo "digest=$DIGEST" >> $GITHUB_OUTPUT
+
       - name: Install cosign
         run: |
           curl -sSL -o /usr/local/bin/cosign https://github.com/sigstore/cosign/releases/latest/download/cosign-linux-amd64
@@ -39,11 +48,8 @@ jobs:
       - name: Write cosign.key to disk
         run: echo "${{ secrets.COSIGN_KEY }}" > cosign.key
 
-      - name: Sign Docker Image
+      - name: Sign Docker Image by Digest
         env:
           COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
         run: |
-          cosign sign --key cosign.key ${{ secrets.DOCKER_USERNAME }}/devops360-app:latest
-
-      - name: Push Docker Image
-        run: docker push ${{ secrets.DOCKER_USERNAME }}/devops360-app:latest
+          cosign sign --key cosign.key --yes ${{ steps.digest.outputs.digest }}
