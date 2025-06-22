@@ -52,7 +52,7 @@ DDB_TABLE = 'my-app-db'              # Your DynamoDB table name
 # Create AWS clients/resources with explicit region
 s3_client = boto3.client('s3', region_name=AWS_REGION)
 ddb = boto3.resource('dynamodb', region_name=AWS_REGION)
-table = ddb.Table(DDB_TABLE)
+table = ddb.Table(DDB_TABLE) # type: ignore
 
 # --- Secrets Manager Function Integration ---
 def get_secret(secret_name, region_name):
@@ -60,7 +60,7 @@ def get_secret(secret_name, region_name):
     Retrieve a secret from AWS Secrets Manager.
     This function fetches and parses the JSON secret string.
     """
-    session = boto3.session.Session()
+    session = boto3.Session()
     client = session.client(service_name='secretsmanager', region_name=region_name)
     try:
         get_secret_value_response = client.get_secret_value(SecretId=secret_name)
@@ -297,7 +297,7 @@ def login_user(request: Request, username: str = Form(...), password: str = Form
         })
 
 @app.get('/profile')
-def profile_page(request: Request, user: str = None, token_data: dict = Depends(require_cognito_token)):
+def profile_page(request: Request, user: Optional[str] = None, token_data: dict = Depends(require_cognito_token)):
     """
     Show the user's profile page.
     - Protected: requires a valid Cognito token from a cookie or Authorization header.
@@ -360,7 +360,7 @@ def send_message(request: Request):
     return RedirectResponse('/profile', status_code=302)
 
 @app.get('/download/{filename}')
-def download_file(filename: str, user: str = None):
+def download_file(filename: str, user: Optional[str] = None):
     """
     Download a file from S3 for the user.
     - Streams the file from S3 to the browser

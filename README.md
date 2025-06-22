@@ -1,13 +1,111 @@
-# DevOps360 – FastAPI + AWS DynamoDB/S3 Example
+# DevOps360 – FastAPI + AWS Cognito, S3, DynamoDB & Secrets Manager
 
 ## 🚀 What is this project?
-This is a simple, modern web app built with **FastAPI** (Python) that lets you:
-- Register and log in users
-- Store user data (including address, zip code, and profile photo) in **DynamoDB**
-- Upload and download files to/from **S3**
-- See your profile and uploaded files
+This is a modern, secure web application built with **FastAPI** that demonstrates a complete user authentication and profile management lifecycle using a suite of AWS services. It's an excellent reference for learning how to integrate Python web apps with a secure, production-ready AWS backend.
 
-It's designed for beginners and DevOps learners who want to see how Python, AWS, and web apps work together.
+### Features:
+-   **Secure User Authentication with AWS Cognito:**
+    -   User registration with email/phone confirmation.
+    -   Secure login with Cognito handling all password management.
+    -   Cookie-based session management for a seamless user experience.
+    -   Protected endpoints that require a valid login session.
+    -   Secure logout functionality.
+-   **Secret Management with AWS Secrets Manager:**
+    -   No hardcoded credentials. The Cognito client secret is fetched securely at startup.
+-   **File Storage with Amazon S3:**
+    -   Users can upload profile photos and other files to a dedicated S3 bucket.
+-   **Profile Data Storage with Amazon DynamoDB:**
+    -   Stores additional user profile information (like address) that is not part of the core Cognito attributes.
+
+---
+
+## 🏗️ Architecture Overview
+
+1.  **Frontend:** The user interacts with HTML pages rendered by FastAPI's Jinja2 templating engine.
+2.  **Backend (FastAPI):** The Python web server that handles all API requests.
+3.  **Authentication (AWS Cognito):** Handles all user sign-up, sign-in, and confirmation flows. FastAPI communicates with Cognito via `boto3`.
+4.  **Secrets (AWS Secrets Manager):** The FastAPI application fetches the Cognito client secret from Secrets Manager on startup.
+5.  **Database (Amazon DynamoDB):** Stores non-sensitive, supplementary user profile data.
+6.  **File Storage (Amazon S3):** Used for storing user-uploaded profile pictures and other files.
+
+---
+
+## 🛠️ Prerequisites
+-   Python 3.10+
+-   An AWS account with the [AWS CLI configured](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html).
+-   Your IAM user/role must have permissions for: **Cognito, S3, DynamoDB, and Secrets Manager**.
+
+### AWS Resource Setup:
+1.  **AWS Cognito User Pool:**
+    -   Create a User Pool.
+    -   In your App Client settings, ensure the **"USER_PASSWORD_AUTH"** flow is enabled.
+2.  **Amazon S3 Bucket:**
+    -   Create a new S3 bucket in the same region as your app.
+3.  **Amazon DynamoDB Table:**
+    -   Create a new DynamoDB table with `user_id` (String) as the partition key.
+4.  **AWS Secrets Manager Secret:**
+    -   Create a new secret with the name `devops360/cognito`.
+    -   Store it as a key/value pair:
+        -   **Key:** `COGNITO_APP_CLIENT_SECRET`
+        -   **Value:** Your Cognito App Client's secret value.
+
+---
+
+## ⚙️ Setup & Run
+1.  **Clone the repo and enter the directory.**
+2.  **Create a virtual environment:**
+    ```bash
+    python3 -m venv venv
+    source venv/bin/activate
+    ```
+3.  **Install dependencies:**
+    ```bash
+    pip install -r requirements.txt
+    ```
+4.  **(Optional) Update configuration in `main.py`:**
+    -   If your AWS resources have different names or are in a different region, update the configuration variables at the top of `main.py`.
+5.  **Run the app:**
+    ```bash
+    python main.py
+    ```
+6.  **Open your browser** and go to [http://localhost:8000](http://localhost:8000).
+
+---
+
+## 📝 How it Works
+
+#### Registration Flow
+1.  A new user fills out the registration form.
+2.  The `/register` endpoint calls Cognito's `sign_up` function.
+3.  Cognito creates the user in an "UNCONFIRMED" state and sends a confirmation code via email/SMS.
+4.  The user is redirected to the `/confirm` page.
+
+#### Confirmation Flow
+1.  The user enters their username and the confirmation code.
+2.  The `/confirm` endpoint calls Cognito's `confirm_sign_up` function.
+3.  If the code is valid, the user's status is set to "CONFIRMED".
+
+#### Login Flow
+1.  The user submits their username and password.
+2.  The `/login` endpoint calls Cognito's `initiate_auth` function.
+3.  If successful, Cognito returns JWT tokens.
+4.  The server sets the `access_token` in a secure, `httponly` cookie and redirects the user to their profile.
+
+#### Protected Routes & Sessions
+-   Endpoints like `/profile` are protected by a FastAPI dependency (`require_cognito_token`).
+-   This dependency checks for the `cognito_token` cookie on every request. If the cookie is present and contains a valid JWT, access is granted. Otherwise, it's denied.
+
+#### Logout Flow
+-   Clicking the "Logout" button sends a request to the `/logout` endpoint.
+-   This endpoint clears the `cognito_token` cookie and redirects the user to the home page.
+
+---
+
+## 📚 Useful Links
+-   [FastAPI Documentation](https://fastapi.tiangolo.com/)
+-   [Boto3 Documentation](https://boto3.amazonaws.com/v1/documentation/api/latest/index.html)
+-   [AWS Cognito Docs](https://docs.aws.amazon.com/cognito/index.html)
+-   [AWS Secrets Manager Docs](https://docs.aws.amazon.com/secretsmanager/index.html)
 
 ---
 
@@ -25,77 +123,6 @@ Devops360/
 ├── README.md            # This file
 └── .gitignore           # Git ignore rules
 ```
-
----
-
-## 🛠️ Prerequisites
-- Python 3.10+
-- AWS account
-- AWS CLI configured (`aws configure`)
-- DynamoDB table: `my-app-db` (partition key: `user_id`, type: String)
-- S3 bucket: `my-s3-real-bucket` (in the same region as your DynamoDB table)
-- Your AWS credentials must have access to both DynamoDB and S3
-
----
-
-## ⚙️ Setup & Run
-1. **Clone the repo and enter the directory**
-2. **Create a virtual environment:**
-   ```bash
-   python3 -m venv venv
-   source venv/bin/activate
-   ```
-3. **Install dependencies:**
-   ```bash
-   pip install fastapi uvicorn jinja2 python-multipart boto3
-   ```
-4. **Set your AWS region in `main.py`:**
-   ```python
-   AWS_REGION = 'us-east-1'  # Change to your region if needed
-   ```
-5. **Run the app:**
-   ```bash
-   python main.py
-   ```
-6. **Open your browser:**
-   - Go to [http://localhost:8000](http://localhost:8000)
-
----
-
-## 📝 How it Works (with Comments)
-
-### 1. **AWS Setup in Code**
-- The app uses `boto3` to connect to DynamoDB and S3.
-- You must set the correct AWS region in `main.py`:
-  ```python
-  AWS_REGION = 'us-east-1'  # <-- Set this to your region
-  s3_client = boto3.client('s3', region_name=AWS_REGION)
-  ddb = boto3.resource('dynamodb', region_name=AWS_REGION)
-  table = ddb.Table('my-app-db')
-  ```
-
-### 2. **User Registration**
-- Checks if the username exists in DynamoDB.
-- If a profile photo is uploaded, it is saved to S3 and the public URL is stored in DynamoDB.
-- All user data (username, email, password, address, zip code, photo URL) is saved as a single item in DynamoDB.
-
-### 3. **Login**
-- Fetches the user from DynamoDB by `user_id`.
-- Checks the password (plain text for demo; in real apps, always hash passwords!).
-- If correct, redirects to the profile page.
-
-### 4. **Profile Page**
-- Loads user data from DynamoDB.
-- Lists all files in S3 under the user's folder (e.g., `username/filename.txt`).
-- Shows address, zip code, and profile photo (if present).
-
-### 5. **File Upload**
-- Lets the user upload files to S3 (stored as `username/filename`).
-- Uploaded files are listed on the profile page.
-
-### 6. **File Download**
-- Streams files from S3 to the user's browser.
-- Only allows download if the user is logged in.
 
 ---
 
