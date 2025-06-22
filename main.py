@@ -27,8 +27,10 @@ from typing import Optional
 # =====================
 # AWS CONFIGURATION
 # =====================
-# Set your AWS region here (must match where your DynamoDB table and S3 bucket are)
-AWS_REGION = 'il-central-1'  # <-- CHANGE THIS TO YOUR REGION IF NEEDED
+# All configuration is now loaded from environment variables for cloud-native best practice.
+AWS_REGION = os.environ.get('AWS_REGION', 'il-central-1')
+S3_BUCKET = os.environ['S3_BUCKET_NAME']
+DDB_TABLE = os.environ['DYNAMODB_TABLE_NAME']
 
 # =====================
 # FASTAPI APP SETUP
@@ -44,11 +46,6 @@ templates = Jinja2Templates(directory='templates')
 # =====================
 # AWS CLIENTS & SECRETS
 # =====================
-# S3_BUCKET: stores user-uploaded files and profile photos
-# DDB_TABLE: stores additional user profile data (not authentication info)
-S3_BUCKET = 'my-s3-real-bucket'      # Your S3 bucket name
-DDB_TABLE = 'my-app-db'              # Your DynamoDB table name
-
 # Create AWS clients/resources with explicit region
 s3_client = boto3.client('s3', region_name=AWS_REGION)
 ddb = boto3.resource('dynamodb', region_name=AWS_REGION)
@@ -85,9 +82,9 @@ except Exception as e:
 # COGNITO CONFIGURATION
 # =====================
 # All authentication is handled by Cognito (not DynamoDB)
-COGNITO_USER_POOL_ID = "il-central-1_7HLCsDkyy"
-COGNITO_REGION = "il-central-1"
-COGNITO_APP_CLIENT_ID = "7k4ncjbllfr6o8fvd8e28jf2vr"
+COGNITO_USER_POOL_ID = os.environ['COGNITO_USER_POOL_ID']
+COGNITO_REGION = AWS_REGION
+COGNITO_APP_CLIENT_ID = os.environ['COGNITO_USER_POOL_CLIENT_ID']
 # COGNITO_APP_CLIENT_SECRET is now loaded from AWS Secrets Manager
 COGNITO_JWKS_URL = f"https://cognito-idp.{COGNITO_REGION}.amazonaws.com/{COGNITO_USER_POOL_ID}/.well-known/jwks.json"
 

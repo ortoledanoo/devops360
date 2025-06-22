@@ -57,3 +57,21 @@ jobs:
 
       - name: Securely delete cosign.key
         run: shred -u cosign.key
+
+  deploy:
+    runs-on: ubuntu-latest
+    environment: Development
+    steps:
+      # ... your build steps ...
+      - name: Build Docker image
+        run: |
+          docker build -t myapp:latest .
+
+      - name: Run container with env vars (for test, not prod)
+        run: |
+          docker run -d \
+            --env DYNAMODB_TABLE_NAME=${{ secrets.DYNAMODB_TABLE_NAME }} \
+            --env S3_BUCKET_NAME=${{ secrets.S3_BUCKET_NAME }} \
+            --env COGNITO_USER_POOL_ID=${{ secrets.COGNITO_USER_POOL_ID }} \
+            --env COGNITO_USER_POOL_CLIENT_ID=${{ secrets.COGNITO_USER_POOL_CLIENT_ID }} \
+            myapp:latest
