@@ -1,6 +1,9 @@
 name: CI-CD Pipeline
 
-on: push
+on:
+  push:
+    branches:
+      - main
 
 jobs:
   build:
@@ -41,9 +44,7 @@ jobs:
           echo "digest=$DIGEST" >> $GITHUB_OUTPUT
 
       - name: Install cosign
-        run: |
-          curl -sSL -o /usr/local/bin/cosign https://github.com/sigstore/cosign/releases/latest/download/cosign-linux-amd64
-          chmod +x /usr/local/bin/cosign
+        uses: sigstore/cosign-installer@v3.4.0
 
       - name: Write cosign.key to disk
         run: echo "${{ secrets.COSIGN_KEY }}" > cosign.key
@@ -53,3 +54,6 @@ jobs:
           COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
         run: |
           cosign sign --key cosign.key --yes ${{ steps.digest.outputs.digest }}
+
+      - name: Securely delete cosign.key
+        run: shred -u cosign.key
