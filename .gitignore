@@ -32,6 +32,10 @@
 !*.tf
 !*.tfvars
 
+# Allow .github and workflows for GitHub Actions
+!.github/
+!.github/workflows/
+
 # Allow YAML files (for k8s, etc.)
 !*.yml
 !*.yaml
