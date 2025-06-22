@@ -36,11 +36,14 @@ jobs:
           curl -sSL -o /usr/local/bin/cosign https://github.com/sigstore/cosign/releases/latest/download/cosign-linux-amd64
           chmod +x /usr/local/bin/cosign
 
+      - name: Write cosign.key to disk
+        run: echo "${{ secrets.COSIGN_KEY }}" > cosign.key
+
       - name: Sign Docker Image
         env:
           COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
         run: |
-          cosign sign --key ${{ secrets.COSIGN_KEY }} ${{ secrets.DOCKER_USERNAME }}/devops360-app:latest
+          cosign sign --key cosign.key ${{ secrets.DOCKER_USERNAME }}/devops360-app:latest
 
       - name: Push Docker Image
         run: docker push ${{ secrets.DOCKER_USERNAME }}/devops360-app:latest
