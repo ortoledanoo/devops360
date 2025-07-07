@@ -30,7 +30,6 @@
 
 # Allow Terraform files if exists
 !*.tf
-!*.tfvars
 
 # Allow .github and workflows for GitHub Actions
 !.github/
