@@ -1,18 +1,18 @@
-# Ignore everything
+# Ignore everything by default
 *
 
-# Allow Python files
+# Allow Python files in root and app/ structure
 !*.py
+!app/
+!app/**
 
-# Allow HTML templates
-!*.html
-!templates/
-!templates/**
+# Allow HTML templates in app/templates/
+!app/templates/
+!app/templates/**
 
-# Allow CSS files
-!*.css
-!static/
-!static/**
+# Allow static assets in app/static/
+!app/static/
+!app/static/**
 
 # Allow README
 !README.md
@@ -47,3 +47,13 @@
 
 # Allow markdown files
 !*.md
+
+# Ignore Python cache and environment files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+venv/
+.env
+.env.*
