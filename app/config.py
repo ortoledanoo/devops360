@@ -1,8 +1,7 @@
 """
 Configuration module for DevOps360 FastAPI application.
 
-Loads all environment variables required for AWS and Cognito integration.
-This centralizes configuration for easy management and cloud-native best practices.
+Loads all environment variables required for AWS
 """
 
 import os

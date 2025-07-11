@@ -1,9 +1,9 @@
 """
-Main entry point for the DevOps360 FastAPI application.
+Main entry point for the DevOps360 application.
 
 - Initializes the FastAPI app instance
 - Mounts static files and sets up Jinja2 templates
-- Includes routers for authentication and profile management
+- Loads routers modulesfor main authentication and profile management
 - Defines the home page route
 """
 
@@ -21,7 +21,7 @@ app.mount('/static', StaticFiles(directory='app/static'), name='static')
 # Set up Jinja2 templates for rendering HTML pages
 templates = Jinja2Templates(directory='app/templates')
 
-# Include authentication and profile routers
+# Include authentication and profile routers (diffrent modules /routes path)
 app.include_router(auth.router)
 app.include_router(profile.router)
 

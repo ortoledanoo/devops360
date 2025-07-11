@@ -1,7 +1,7 @@
 /*
-    style.css: (Legacy) Custom CSS for DevOps360.
-    - Used before Tailwind CSS was integrated.
-    - Provided basic layout, color, and form styling for all pages.
-    - Now replaced by Tailwind CSS for all styling needs.
-*/
- 
+  This is the main CSS file for your FastAPI app.
+
+  - The 'app/static' directory must exist for FastAPI/Starlette to serve static files.
+  - If you remove this directory,  your app will try to mount '/static' folder andyou will get a RuntimeError at startup.
+  - This file can be empty, but the directory must exist.
+*/ 
