@@ -22,12 +22,18 @@ def get_secret(secret_name, region_name):
 
 # --- Use get_secret function to load Cognito secrets ---
 try:
+    print(f"INFO: Attempting to load secret 'devops360/cognito' from region {AWS_REGION}")
     cognito_secrets = get_secret("devops360/cognito", AWS_REGION)
     COGNITO_APP_CLIENT_SECRET = cognito_secrets.get('COGNITO_APP_CLIENT_SECRET')
     if not COGNITO_APP_CLIENT_SECRET:
         raise ValueError("COGNITO_APP_CLIENT_SECRET not found in secret 'devops360/cognito'")
+    print("INFO: Successfully loaded Cognito client secret from Secrets Manager")
 except Exception as e:
-    print(f"FATAL: Could not load secrets from AWS Secrets Manager. {e}")
+    print(f"FATAL: Could not load secrets from AWS Secrets Manager. Error: {e}")
+    print(f"FATAL: Error type: {type(e).__name__}")
+    if hasattr(e, 'response'):
+        print(f"FATAL: AWS Error Code: {e.response.get('Error', {}).get('Code', 'Unknown')}")
+        print(f"FATAL: AWS Error Message: {e.response.get('Error', {}).get('Message', 'Unknown')}")
     COGNITO_APP_CLIENT_SECRET = None
 
 _cognito_jwks = None

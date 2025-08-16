@@ -37,10 +37,21 @@ def cognito_register(
             ]
         }
         from app.services.cognito import COGNITO_APP_CLIENT_SECRET
+        print(f"DEBUG: COGNITO_APP_CLIENT_SECRET is {'available' if COGNITO_APP_CLIENT_SECRET else 'None'}")
         if COGNITO_APP_CLIENT_SECRET:
             params['SecretHash'] = get_secret_hash(username)
+        else:
+            print("WARNING: No Cognito client secret available - registration may fail")
+        
+        print(f"DEBUG: Attempting Cognito sign_up for user: {username}")
         cognito_client.sign_up(**params)
+        print(f"INFO: Successfully registered user: {username}")
     except Exception as e:
+        print(f"ERROR: Registration failed for user {username}: {e}")
+        print(f"ERROR: Exception type: {type(e).__name__}")
+        if hasattr(e, 'response'):
+            print(f"ERROR: AWS Error Code: {e.response.get('Error', {}).get('Code', 'Unknown')}")
+            print(f"ERROR: AWS Error Message: {e.response.get('Error', {}).get('Message', 'Unknown')}")
         return templates.TemplateResponse('register.html', {
             'request': request,
             'error': cognito_error_message(e)
