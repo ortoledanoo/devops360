@@ -60,15 +60,25 @@ def verify_cognito_token(token):
     except Exception as e:
         print(f"Cognito token verification failed: {e}")
         return None
-
 def get_secret_hash(username: str) -> str:
+    print(f"DEBUG: COGNITO_APP_CLIENT_SECRET is {'available' if COGNITO_APP_CLIENT_SECRET else 'None'}")
+    print(f"DEBUG: Username: {username}")
+    print(f"DEBUG: Client ID: {COGNITO_APP_CLIENT_ID}")
+    
     message = username + COGNITO_APP_CLIENT_ID
+    print(f"DEBUG: Message for HMAC: {message}")
+    
+    if not COGNITO_APP_CLIENT_SECRET:
+        raise ValueError("COGNITO_APP_CLIENT_SECRET is None or empty")
+    
     dig = hmac.new(
         str(COGNITO_APP_CLIENT_SECRET).encode('utf-8'),
         msg=message.encode('utf-8'),
         digestmod=hashlib.sha256
     ).digest()
-    return base64.b64encode(dig).decode()
+    secret_hash = base64.b64encode(dig).decode()
+    print(f"DEBUG: Generated SecretHash: {secret_hash}")
+    return secret_hash
 
 cognito_client = boto3.client('cognito-idp', region_name=COGNITO_REGION)
 
