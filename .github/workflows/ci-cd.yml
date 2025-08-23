@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - dev
 
 jobs:
   build:
@@ -12,6 +13,15 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Setup Python and run pylint
+        run: |
+          if [ ! -d "venv" ]; then
+            python3 -m venv venv
+          fi
+          . ./venv/bin/activate
+          pip install -r requirements.txt
+          pylint --fail-under=5 app/
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -48,7 +58,7 @@ jobs:
           DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' ${{ secrets.DOCKER_USERNAME }}/devops360-app:latest)
           echo "digest=$DIGEST" >> $GITHUB_OUTPUT
 
-      - name: Install cosign
+      - name: Install cosignז
         uses: sigstore/cosign-installer@v3.4.0
 
       - name: Write cosign.key to disk
