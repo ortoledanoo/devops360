@@ -1,5 +1,5 @@
 # Build stage: Install dependencies in a clean layer
-FROM python:3.10-slim AS builder
+FROM python:3.14.0rc2-alpine3.22 AS builder
 
 WORKDIR /app
 
@@ -8,7 +8,7 @@ COPY requirements.txt .
 RUN pip install --user --no-cache-dir -r requirements.txt
 
 # Final stage: Copy only what is needed for runtime
-FROM python:3.10-slim
+FROM python:3.14.0rc2-alpine3.22
 
 WORKDIR /app
 
