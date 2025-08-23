@@ -31,3 +31,4 @@ typing_extensions==4.14.0
 urllib3==2.5.0
 uvicorn==0.34.3
 yarg==0.1.10
+pylint==3.3.8
