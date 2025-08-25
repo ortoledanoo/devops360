@@ -1,4 +1,5 @@
 # Build stage: Install dependencies in a clean layer
+
 FROM python:3.13-slim AS builder
 
 WORKDIR /app
@@ -8,6 +9,7 @@ COPY requirements.txt .
 RUN pip install --user --no-cache-dir -r requirements.txt
 
 # Final stage: Copy only what is needed for runtime
+
 FROM python:3.13-slim
 
 WORKDIR /app
